@@ -84,7 +84,7 @@ hit_100 <- simulations %>%
 
 ```{r "hit-100-plot", echo=FALSE, warning=FALSE}
 ggplot(hit_100, aes(true_average)) +
-    geom_histogram()
+  geom_freqpoly()
 ```
 
 
