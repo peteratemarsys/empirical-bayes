@@ -59,4 +59,33 @@ ggplot(beta_distro_dt, aes(x, beta_density_value, color = Parameters)) +
     theme_light()
 ```
 
+  + **Posterior mean** is the expected value of the resulting beta distribution which we can use as our new estimate.
+  \[E(Beta(\alpha, \beta)) = \frac{\alpha}{\alpha + \beta}\]
+  + With the above example you can see that our posterior expectation is higher than our prior but lower than our expectation based on the actual inspected hits and misses:
+  \[\frac{81}{81 + 219} < \frac{182}{182 + 419} < \frac{100}{100 + 200}\]
+
+  + Imagine that our objective is to assess a player who we've seen hit 100/300. We can't take every person with the exact stats and see how they did historically but we can do a simulation:
+```{r "simulate-100/300-player"}
+num_trials <- 10e6
+
+# Take 10mm players whose betting average produces a Beta(81, 219)
+# Then, simulate how well they'd do if they tried to hit the ball 300 times
+simulations <- data_frame(
+  true_average = rbeta(num_trials, 81, 219),
+  hits = rbinom(num_trials, 300, true_average)
+)
+
+simulations
+
+# Now filter for those who hit exactly 100/300 and then plot their true average distribution
+hit_100 <- simulations %>%
+  filter(hits == 100)
+```
+
+```{r "hit-100-plot", echo=FALSE, warning=FALSE}
+ggplot(hit_100, aes(true_average)) +
+    geom_histogram()
+```
+
+
 # II Hypothesis testing
