@@ -8,6 +8,12 @@ Source: CRAN
 Version: 1.65.0-1
 Hash: 95f62be4d6916aae14a310a8b56a6475
 
+Package: Lahman
+Source: CRAN
+Version: 6.0-0
+Hash: a7db87aa61fe9f0a8c229549cb10fee6
+Requires: dplyr
+
 Package: R6
 Source: CRAN
 Version: 2.2.2
@@ -46,7 +52,7 @@ Hash: e3a02070cf705d3ad1c5af1635a515a3
 Package: bindrcpp
 Source: CRAN
 Version: 0.2
-Hash: a2aea10792750b6ab487a6c58c399e60
+Hash: 7f7dcd1dc351f84798fd3dc4eb8a0e78
 Requires: Rcpp, bindr, plogr
 
 Package: bitops
@@ -94,7 +100,7 @@ Hash: e53fb8c58673df868183697e39a6a4d6
 Package: dplyr
 Source: CRAN
 Version: 0.7.4
-Hash: 20cdf9f878ec895f45eb6bc9457bb4fa
+Hash: e1c300a22e22086568531c9d0c93bafc
 Requires: BH, R6, Rcpp, assertthat, bindrcpp, glue, magrittr,
     pkgconfig, plogr, rlang, tibble
 
@@ -200,6 +206,12 @@ Version: 1.8.4
 Hash: 39dd3286b865c7b725d74c9a4c1b7931
 Requires: Rcpp
 
+Package: purrr
+Source: CRAN
+Version: 0.2.4
+Hash: a80b244ccd3fdb33a0ff2be3c50dd648
+Requires: magrittr, rlang, tibble
+
 Package: reshape2
 Source: CRAN
 Version: 1.4.3
@@ -247,6 +259,19 @@ Source: CRAN
 Version: 1.4.2
 Hash: 83895360ce4f8d2ce92eee00526b5b0b
 Requires: cli, crayon, pillar, rlang
+
+Package: tidyr
+Source: CRAN
+Version: 0.8.0
+Hash: 5ed45dd4a0abfeee4d4e9d33731dc06e
+Requires: Rcpp, dplyr, glue, magrittr, purrr, rlang, stringi, tibble,
+    tidyselect
+
+Package: tidyselect
+Source: CRAN
+Version: 0.2.4
+Hash: 1c8ca0e901d44e37689d0dd1ee8e2c08
+Requires: Rcpp, glue, purrr, rlang
 
 Package: utf8
 Source: CRAN
