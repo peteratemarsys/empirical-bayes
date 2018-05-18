@@ -10,6 +10,8 @@ output:
 
 ```{r "load-packages", echo=FALSE, warning=FALSE}
 source('global.R')
+
+theme_set(theme_light())
 ```
 
 # I Empirical Bayes
@@ -26,8 +28,7 @@ beta_distro_dt <- as.data.table(merge(beta_distro_params, x = seq(0, 1, 0.001), 
 ggplot(beta_distro_dt, aes(x, beta_density_value, color = Parameters)) +
     geom_line() +
     scale_y_continuous(name = "Density of beta") +
-    ggtitle("The beta distribution") +
-    theme_light()
+    ggtitle("The beta distribution")
 ```
 
   + **Batting average** is an important baseball statistics which is calculated as the number of **hits (H)** divided by the number of **at-bats (AB)**. A player's batting average is always between 0 and 1 and can be represented with the beta distribution.
