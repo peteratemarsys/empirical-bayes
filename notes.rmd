@@ -1,6 +1,6 @@
 ---
-title: "Notes from *Introduction to Empirical Bayes*"
-author: "Peter Lukacs"
+title: 'Notes from *Introduction to Empirical Bayes*'
+author: 'Peter Lukacs'
 output:
     html_document:
         fig_width: 7
@@ -8,7 +8,7 @@ output:
         fig_align: center
 ---
 
-```{r "load-packages", echo=FALSE, warning=FALSE}
+```{r 'load-packages', echo=FALSE, warning=FALSE}
 source('global.R')
 
 theme_set(theme_light())
@@ -20,15 +20,15 @@ theme_set(theme_light())
 
   + The beta distribution is a probability distribution with two parameters `alpha` and `beta`, constrained to between 0 and 1.
 
-```{r "beta-distro-plot", echo=FALSE}
+```{r 'beta-distro-plot', echo=FALSE}
 beta_distro_params <- data.frame(a = c(1, 3, 20, 50), b = c(2, 3, 20, 10))
 beta_distro_dt <- as.data.table(merge(beta_distro_params, x = seq(0, 1, 0.001), all = TRUE)) %>%
     .[, beta_density_value := dbeta(x, a, b), by = .(x, a, b)] %>%
-    .[, Parameters := sprintf("a: %d, b: %d", a, b)]
+    .[, Parameters := sprintf('a: %d, b: %d', a, b)]
 ggplot(beta_distro_dt, aes(x, beta_density_value, color = Parameters)) +
     geom_line() +
-    scale_y_continuous(name = "Density of beta") +
-    ggtitle("The beta distribution")
+    scale_y_continuous(name = 'Density of beta') +
+    ggtitle('The beta distribution')
 ```
 
   + **Batting average** is an important baseball statistics which is calculated as the number of **hits (H)** divided by the number of **at-bats (AB)**. A player's batting average is always between 0 and 1 and can be represented with the beta distribution.
@@ -46,17 +46,17 @@ ggplot(beta_distro_dt, aes(x, beta_density_value, color = Parameters)) +
 
   + Below is an example of a player: first, our prior expectation about him is that he will have around .27 BA ($Beta(81, 219)$). After this, he hits the ball once out of one, so we update his posterior distribution to $Beta(82, 219)$, a tiny change. Later he will be up to bat 300 times and hits the ball a 100 times out of that, updating his beta to $Beta(181, 419)$.
 
-```{r "beta-distro-update-plot", echo=FALSE}
+```{r 'beta-distro-update-plot', echo=FALSE}
 beta_distro_params <- data.frame(a = c(81, 82, 181), b = c(219, 219, 419))
 beta_distro_dt <- as.data.table(merge(beta_distro_params, x = seq(0, .5, 0.001), all = TRUE)) %>%
     .[, beta_density_value := dbeta(x, a, b), by = .(x, a, b)] %>%
-    .[, Parameters := sprintf("a: %d, b: %d", a, b)]
+    .[, Parameters := sprintf('a: %d, b: %d', a, b)]
 ggplot(beta_distro_dt, aes(x, beta_density_value, color = Parameters)) +
     geom_line() +
     scale_color_manual(values = c('dodgerblue', 'green3', 'violetred')) +
-    scale_y_continuous(name = "Density of beta") +
-    ggtitle("The updated beta distribution") +
-    labs(x = "Batting Average") +
+    scale_y_continuous(name = 'Density of beta') +
+    ggtitle('The updated beta distribution') +
+    labs(x = 'Batting Average') +
     theme_light()
 ```
 
@@ -66,7 +66,7 @@ ggplot(beta_distro_dt, aes(x, beta_density_value, color = Parameters)) +
   \[\frac{81}{81 + 219} < \frac{182}{182 + 419} < \frac{100}{100 + 200}\]
 
   + Imagine that our objective is to assess a player who we've seen hit 100/300. We can't take every person with the exact stats and see how they did historically but we can do a simulation:
-```{r "simulate-100/300-player"}
+```{r 'simulate-100/300-player'}
 num_trials <- 10e6
 
 # Take 10mm players whose betting average produces a Beta(81, 219)
@@ -83,13 +83,13 @@ hit_100 <- simulations %>%
   filter(hits == 100)
 ```
 
-```{r "hit-100-plot", echo=FALSE, warning=FALSE}
+```{r 'hit-100-plot', echo=FALSE, warning=FALSE}
 dens <- function(x) dbeta(x, 81 + 100, 219 + 200)
 
 ggplot(hit_100, aes(true_average)) +
   geom_histogram(aes(y = ..density..)) +
-  stat_function(color = "red", fun = dens) +
-  labs(x = "Batting average of players who got 100 H / 300 AB")
+  stat_function(color = 'red', fun = dens) +
+  labs(x = 'Batting average of players who got 100 H / 300 AB')
 ```
 
 
