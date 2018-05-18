@@ -92,5 +92,19 @@ ggplot(hit_100, aes(true_average)) +
   labs(x = 'Batting average of players who got 100 H / 300 AB')
 ```
 
+  + The median of the histogram (0.3) is our posterior estimate: we believe that a player with history of 100/300 is likely to have a BA of 0.3.
+  + The histogram of the 100/300 batters and the well-fitted Beta density plot (red) confirms the math about the conjugate prior: you can calculate the posterior estimate without running a simulation.
+  + See below cases where players hit 60, 80 or 100 times based on the simulation
 
-# II Hypothesis testing
+```{r 'hit-60-80-100-plot', echo=FALSE, warning=FALSE}
+simulations %>%
+  filter(hits %in% c(60, 80, 100)) %>%
+  ggplot(aes(true_average, color = factor(hits))) +
+    geom_density() +
+    labs(x = 'Batting average of players who got 60, 80, 100 H / 300 AB',
+         color = 'H')
+```
+
+## 2 Empirical Bayes estimation
+
+
