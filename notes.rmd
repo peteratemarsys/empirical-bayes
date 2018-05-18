@@ -84,8 +84,12 @@ hit_100 <- simulations %>%
 ```
 
 ```{r "hit-100-plot", echo=FALSE, warning=FALSE}
+dens <- function(x) dbeta(x, 81 + 100, 219 + 200)
+
 ggplot(hit_100, aes(true_average)) +
-  geom_freqpoly()
+  geom_histogram(aes(y = ..density..)) +
+  stat_function(color = "red", fun = dens) +
+  labs(x = "Batting average of players who got 100 H / 300 AB")
 ```
 
 
