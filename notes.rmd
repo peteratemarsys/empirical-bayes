@@ -2,10 +2,10 @@
 title: 'Notes from *Introduction to Empirical Bayes*'
 author: 'Peter Lukacs'
 output:
-    html_document:
-        fig_width: 7
-        fig_height: 5
-        fig_align: center
+        html_document:
+                fig_width: 7
+                fig_height: 5
+                fig_align: center
 ---
 
 ```{r 'load-packages', echo=FALSE, warning=FALSE}
@@ -33,16 +33,16 @@ ggplot(beta_distro_dt, aes(x, beta_density_value, color = Parameters)) +
 
   + **Batting average** is an important baseball statistics which is calculated as the number of **hits (H)** divided by the number of **at-bats (AB)**. A player's batting average is always between 0 and 1 and can be represented with the beta distribution.
 
-  \[Batting\ Average = \frac{H}{AB}\]
+    \[Batting\ Average = \frac{H}{AB}\]
 
   + If a player starts out with a single or a strike out we wont't predict that his BA will be 1 or 0. This is because we've seen in the history that players tend to have a BA between .270 and .300, thus we have *prior expectations*.
 
-  > The number of hits a player gets out of his at-bats is an example of a **binomial distribution**, which models a count of successes out of a total. Since it's a binomial, the best way to represent the prior expectations is with the beta distribution.
+    > The number of hits a player gets out of his at-bats is an example of a **binomial distribution**, which models a count of successes out of a total. Since it's a binomial, the best way to represent the prior expectations is with the beta distribution.
 
-  > This is the Bayesian philosophy in a nutshell: we start with a prior distribution, see some evidence, then update to a **posterior** distribution.
+    > This is the Bayesian philosophy in a nutshell: we start with a prior distribution, see some evidence, then update to a **posterior** distribution.
 
   + Update the beta distribution this way:
-  \[Beta(\alpha_0 + hits,\ \beta_0 + misses)\]
+    \[Beta(\alpha_0 + hits,\ \beta_0 + misses)\]
 
   + Below is an example of a player: first, our prior expectation about him is that he will have around .27 BA ($Beta(81, 219)$). After this, he hits the ball once out of one, so we update his posterior distribution to $Beta(82, 219)$, a tiny change. Later he will be up to bat 300 times and hits the ball a 100 times out of that, updating his beta to $Beta(181, 419)$.
 
@@ -61,35 +61,36 @@ ggplot(beta_distro_dt, aes(x, beta_density_value, color = Parameters)) +
 ```
 
   + **Posterior mean** is the expected value of the resulting beta distribution which we can use as our new estimate.
-  \[E(Beta(\alpha, \beta)) = \frac{\alpha}{\alpha + \beta}\]
+    \[E(Beta(\alpha, \beta)) = \frac{\alpha}{\alpha + \beta}\]
   + With the above example you can see that our posterior expectation is higher than our prior but lower than our expectation based on the actual inspected hits and misses:
-  \[\frac{81}{81 + 219} < \frac{182}{182 + 419} < \frac{100}{100 + 200}\]
+    \[\frac{81}{81 + 219} < \frac{182}{182 + 419} < \frac{100}{100 + 200}\]
 
   + Imagine that our objective is to assess a player who we've seen hit 100/300. We can't take every person with the exact stats and see how they did historically but we can do a simulation:
+
 ```{r 'simulate-100/300-player'}
 num_trials <- 10e6
 
 # Take 10mm players whose betting average produces a Beta(81, 219)
 # Then, simulate how well they'd do if they tried to hit the ball 300 times
 simulations <- data_frame(
-  true_average = rbeta(num_trials, 81, 219),
-  hits = rbinom(num_trials, 300, true_average)
+    true_average = rbeta(num_trials, 81, 219),
+    hits = rbinom(num_trials, 300, true_average)
 )
 
 simulations
 
 # Now filter for those who hit exactly 100/300 and then plot their true average distribution
 hit_100 <- simulations %>%
-  filter(hits == 100)
+    filter(hits == 100)
 ```
 
 ```{r 'hit-100-plot', echo=FALSE, warning=FALSE}
 dens <- function(x) dbeta(x, 81 + 100, 219 + 200)
 
 ggplot(hit_100, aes(true_average)) +
-  geom_histogram(aes(y = ..density..)) +
-  stat_function(color = 'red', fun = dens) +
-  labs(x = 'Batting average of players who got 100 H / 300 AB')
+    geom_histogram(aes(y = ..density..)) +
+    stat_function(color = 'red', fun = dens) +
+    labs(x = 'Batting average of players who got 100 H / 300 AB')
 ```
 
   + The median of the histogram (0.3) is our posterior estimate: we believe that a player with history of 100/300 is likely to have a BA of 0.3.
@@ -98,11 +99,11 @@ ggplot(hit_100, aes(true_average)) +
 
 ```{r 'hit-60-80-100-plot', echo=FALSE, warning=FALSE}
 simulations %>%
-  filter(hits %in% c(60, 80, 100)) %>%
-  ggplot(aes(true_average, color = factor(hits))) +
-    geom_density() +
-    labs(x = 'Batting average of players who got 60, 80, 100 H / 300 AB',
-         color = 'H')
+    filter(hits %in% c(60, 80, 100)) %>%
+    ggplot(aes(true_average, color = factor(hits))) +
+        geom_density() +
+        labs(x = 'Batting average of players who got 60, 80, 100 H / 300 AB',
+                 color = 'H')
 ```
 
 ## 3 Empirical Bayes estimation
@@ -118,19 +119,19 @@ library(Lahman)
 
 # Filter out pitchers (b/c they are unusually weak batters)
 career <- Batting %>%
-  filter(AB > 0) %>%
-  anti_join(Pitching, by = 'playerID') %>%
-  group_by(playerID)  %>%
-  summarize(H = sum(H), AB = sum(AB)) %>%
-  mutate(average = H / AB)
+    filter(AB > 0) %>%
+    anti_join(Pitching, by = 'playerID') %>%
+    group_by(playerID)  %>%
+    summarize(H = sum(H), AB = sum(AB)) %>%
+    mutate(average = H / AB)
 
 # Include names
 career  <- Master %>%
-  tibble::as_tibble() %>%
-  select(playerID, nameFirst, nameLast) %>%
-  unite(name, nameFirst, nameLast, sep = ' ') %>%
-  inner_join(career, by = 'playerID') %>%
-  select(-playerID)
+    tibble::as_tibble() %>%
+    select(playerID, nameFirst, nameLast) %>%
+    unite(name, nameFirst, nameLast, sep = ' ') %>%
+    inner_join(career, by = 'playerID') %>%
+    select(-playerID)
 
 career
 ```
