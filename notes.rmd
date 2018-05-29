@@ -145,6 +145,17 @@ career %>% top_n(-5, average)
 
 #### 3.2 Step 1: Estimate a prior from all the data
 
+  + It's sometimes not appropriate to use the data we analyze to calculate the priors but with the amount of data we have currenltly it's fine, since the estimate won't depend much on any individual.
+  + The below histogram shows that a beta distribution is a pretty appropriate choice for our data
 
+```{r 'histogram-of-BAs', echo=FALSE, warning=FALSE}
+career %>%
+    filter(AB > 500) %>%
+    ggplot(aes(average)) +
+        geom_histogram(bins = 50)
+```
 
+  + Now we would need to fit the follwing model to find the $\alpha_0$ and $\beta_0$ *hyper-parameters*:
+
+    \[ X \sim Beta(\alpha_0, \beta_0) \]
 <!-- # II Hypothesis testing -->
