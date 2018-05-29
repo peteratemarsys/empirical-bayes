@@ -1,5 +1,5 @@
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(tidyr))
-suppressPackageStartupMessages(library(Lahman))
 suppressPackageStartupMessages(library(data.table))
+suppressPackageStartupMessages(library(Lahman))
