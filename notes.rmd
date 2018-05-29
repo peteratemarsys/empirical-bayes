@@ -105,6 +105,45 @@ simulations %>%
          color = 'H')
 ```
 
-## 2 Empirical Bayes estimation
+## 3 Empirical Bayes estimation
+
+  + This method will fit a beta distribution on all observations which is then use to omprove each individually. This way we won't need to have prior expectations
+
+#### 3.1 Setup: the Lahman baseball dataset
+
+  + From now on we'll be working on real data from the *Lahman baseball dataset*
+
+```{r 'lahmna-dataset', warning=FALSE}
+library(Lahman)
+
+# Filter out pitchers (b/c they are unusually weak batters)
+career <- Batting %>%
+  filter(AB > 0) %>%
+  anti_join(Pitching, by = 'playerID') %>%
+  group_by(playerID)  %>%
+  summarize(H = sum(H), AB = sum(AB)) %>%
+  mutate(average = H / AB)
+
+# Include names
+career  <- Master %>%
+  tibble::as_tibble() %>%
+  select(playerID, nameFirst, nameLast) %>%
+  unite(name, nameFirst, nameLast, sep = ' ') %>%
+  inner_join(career, by = 'playerID') %>%
+  select(-playerID)
+
+career
+```
+
+The following tables show you that simply using the average column won't get us the best or worst players
+
+```{r 'best-worst-average', echo=FALSE, warning=FALSE}
+career %>% top_n(5, average)
+career %>% top_n(-5, average)
+```
+
+#### 3.2 Step 1: Estimate a prior from all the data
 
 
+
+<!-- # II Hypothesis testing -->
