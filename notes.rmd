@@ -115,8 +115,6 @@ simulations %>%
   + From now on we'll be working on real data from the *Lahman baseball dataset*
 
 ```{r 'lahmna-dataset', warning=FALSE}
-library(Lahman)
-
 # Filter out pitchers (b/c they are unusually weak batters)
 career <- Batting %>%
     filter(AB > 0) %>%
