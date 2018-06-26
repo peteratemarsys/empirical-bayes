@@ -158,4 +158,35 @@ career %>%
   + Now we would need to fit the follwing model to find the $\alpha_0$ and $\beta_0$ *hyper-parameters*:
 
     \[ X \sim Beta(\alpha_0, \beta_0) \]
+
+```{r 'maximum-likelihood'}
+career_filtered <- career %>%
+    filter(AB > 500)
+
+log_likelihood <- function(alpha, beta) {
+  x <- career_filtered$H
+  total <- career_filtered$AB
+  -sum(VGAM::dbetabinom.ab(x, total, alpha, beta, log = TRUE))
+}
+
+max_likelihood_estimation <- mle(log_likelihood, start = list(alpha = 1, beta = 10), method = 'L-BFGS-B',
+                                 lower = c(0.0001, .1))
+
+ab <- coef(max_likelihood_estimation)
+
+alpha0 <- ab[1]
+beta0 <- ab[2]
+
+dens <- function(x) dbeta(x, alpha0, beta0)
+
+ggplot(career_filtered, aes(average)) +
+    geom_histogram(aes(y = ..density..), bins = 50) +
+    stat_function(color = 'red', fun = dens, size = 2) +
+    labs(title = 'Histogram of BAs and the maximum likelihood fitted beta density distribution',
+         x = 'BA',
+         y = 'density')
+```
+
+
+
 <!-- # II Hypothesis testing -->
