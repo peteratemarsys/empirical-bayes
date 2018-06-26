@@ -185,6 +185,42 @@ ggplot(career_filtered, aes(average)) +
          y = 'density')
 ```
 
+  + The maximum likelihood model came up with $\alpha_0 =$ `r round(alpha0, 2)` and $\beta_0 =$ `r round(beta0, 2)`. We can see from the above plot that it fits the actual data pretty well.
 
+#### 3.3 Step 2: Use that distribution as a prior for each individual estimate
 
-<!-- # II Hypothesis testing -->
+  + Now we can update our data with our priors like so:
+
+\[\frac{H + \alpha_0}{AB + \alpha_0 + \beta_0}\]
+
+```{r 'empirical-bayes-estimate'}
+career_eb <- career %>%
+    mutate(eb_estimate = (H + alpha0) / (AB + alpha0 + beta0))
+```
+
+#### 3.4 Results
+
+  + And we're able to ask who is the best/worst player:
+
+```{r 'best-wors-emipircal-bayes-estimate', echo = FALSE}
+career_eb %>% top_n(5, eb_estimate)
+career_eb %>% top_n(-5, eb_estimate)
+```
+
+  + See below how empirical Bayes changed our estimate of batting averages:
+
+```{r 'empirical-vs-bayesian-batting-averages', echo = FALSE}
+ggplot(career_eb, aes(average, eb_estimate, color = AB)) +
+    geom_point() +
+    geom_hline(yintercept = alpha0 / (alpha0 + beta0), color = 'red', lty = 2) +
+    geom_abline(color = 'red') +
+    scale_colour_gradient(trans = 'log', breaks = 10 ^ (1:5)) +
+    xlab('Batting average') +
+    ylab('Empirical Bayes batting average')
+```
+
+  + The horizontal dashed lines shows $\frac{\alpha_0}{\alpha_0 + \beta_0}$. That would be our Bayesian estimate if someone would have $AB = H = 0$. The red diagonal line shows $x = y$. Points near that line are the brightest, because the more evidence we have, the less we distort (update) the average with the priors.
+
+  > This process is often called **shrinkage**: the process of moving all our estimates towards the averge. Or in other words: *Extraordinary outliers require extraordinary evidence.*
+
+## 4. Credible Intervals
