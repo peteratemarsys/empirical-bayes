@@ -108,7 +108,7 @@ simulations %>%
 
 ## 3 Empirical Bayes estimation
 
-  + This method will fit a beta distribution on all observations which is then use to omprove each individually. This way we won't need to have prior expectations
+  + This method will fit a beta distribution on all observations which is then used to omprove each individually. This way we won't need to have prior expectations
 
 #### 3.1 Setup: the Lahman baseball dataset
 
