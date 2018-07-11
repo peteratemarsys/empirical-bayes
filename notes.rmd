@@ -2,10 +2,10 @@
 title: 'Notes from *Introduction to Empirical Bayes*'
 author: 'Peter Lukacs'
 output:
-        html_document:
-                fig_width: 7
-                fig_height: 5
-                fig_align: center
+    html_document:
+        fig_width: 7
+        fig_height: 5
+        fig_align: center
 ---
 
 ```{r 'load-packages', echo=FALSE, warning=FALSE}
@@ -128,8 +128,7 @@ career  <- Master %>%
     tibble::as_tibble() %>%
     select(playerID, nameFirst, nameLast) %>%
     unite(name, nameFirst, nameLast, sep = ' ') %>%
-    inner_join(career, by = 'playerID') %>%
-    select(-playerID)
+    inner_join(career, by = 'playerID')
 
 career
 ```
@@ -153,7 +152,7 @@ career %>%
         geom_histogram(bins = 50)
 ```
 
-  + Now we would need to fit the follwing model to find the $\alpha_0$ and $\beta_0$ *hyper-parameters*:
+    + Now we would need to fit the follwing model to find the $\alpha_0$ and $\beta_0$ *hyper-parameters*:
 
     \[ X \sim Beta(\alpha_0, \beta_0) \]
 
@@ -162,9 +161,9 @@ career_filtered <- career %>%
     filter(AB > 500)
 
 log_likelihood <- function(alpha, beta) {
-  x <- career_filtered$H
-  total <- career_filtered$AB
-  -sum(VGAM::dbetabinom.ab(x, total, alpha, beta, log = TRUE))
+    x <- career_filtered$H
+    total <- career_filtered$AB
+    -sum(VGAM::dbetabinom.ab(x, total, alpha, beta, log = TRUE))
 }
 
 max_likelihood_estimation <- mle(log_likelihood, start = list(alpha = 1, beta = 10), method = 'L-BFGS-B',
@@ -207,7 +206,7 @@ career_eb %>% top_n(5, eb_estimate)
 career_eb %>% top_n(-5, eb_estimate)
 ```
 
-  + See below how empirical Bayes changed our estimate of batting averages:
+    + See below how empirical Bayes changed our estimate of batting averages:
 
 ```{r 'empirical-vs-bayesian-batting-averages', echo = FALSE}
 ggplot(career_eb, aes(average, eb_estimate, color = AB)) +
@@ -224,3 +223,132 @@ ggplot(career_eb, aes(average, eb_estimate, color = AB)) +
   > This process is often called **shrinkage**: the process of moving all our estimates towards the averge. Or in other words: *Extraordinary outliers require extraordinary evidence.*
 
 ## 4. Credible Intervals
+
+  > Empirical Bayes gives us a reliable estimate but sometimes we want to know more than just our "best guess", and instead wish to know how much uncertainty is present in our point estimate
+
+  + The problem with binomial proportion confidence interval is that is desn't use prior knowledge. As a result for betters with short history it would give a huge confidence range
+
+#### 4.1 Setup [intentionally left out]
+
+#### 4.2 Posterior distribution
+
+  + Apart from calculating point estimates from priors and evidence from players we can also calculate an updated personal Beta distribution for each player. What we are looking for is $\alpha_1 = \alpha_0 + H$ and $\beta_1 = \beta0 + AB - H$
+
+```{r 'posterior-distributions'}
+career_eb <- career_eb %>%
+    mutate(alpha1 = alpha0 + H,
+           beta1 = beta0 + AB - H)
+```
+
+```{r 'posterior-distributions-plot', echo = FALSE}
+
+yankee_1998 <- c("brosisc01", "jeterde01", "knoblch01", "martiti02",
+                 "posadjo01", "strawda01", "willibe02")
+
+yankee_1998_career <- career_eb %>%
+    filter(playerID %in% yankee_1998)
+
+yankee_beta <- yankee_1998_career %>%
+    crossing(x = seq(.18, .33, .0002)) %>%
+    ungroup() %>%
+    mutate(density = dbeta(x, alpha1, beta1))
+
+ggplot(yankee_beta, aes(x, density, color = name)) +
+    geom_line() +
+    stat_function(fun = function(x) dbeta(x, alpha0, beta0),
+                lty = 2, color = "black") +
+    labs(x = "Batting average",
+         color = "Player")
+```
+
+#### 4.3 Credible intervals
+
+  + These personal distributions are hard to interpret. We rather have information on how much (e.g. 95%) of the posterior distribution lies within a particular region. A credible interval for Derek Jeter is shown below, while 95% credible intervals for the other players under that.
+
+```{r 'jeter-credible-interval'}
+jeter <- yankee_beta %>%
+    filter(name == "Derek Jeter")
+
+jeter_low <- qbeta(.025, jeter$alpha1[1], jeter$beta1[1])
+jeter_high <- qbeta(.975, jeter$alpha1[1], jeter$beta1[1])
+
+jeter %>%
+    ggplot(aes(x, density)) +
+        geom_line() +
+        geom_ribbon(aes(ymin = 0, ymax = density), data = setDT(jeter)[x > jeter_low & x < jeter_high],
+                    alpha = .25, fill = "red") +
+        stat_function(fun = function(x) dbeta(x, alpha0, beta0),
+                    lty = 2, color = "black") +
+        geom_errorbarh(aes(xmin = jeter_low, xmax = jeter_high, y = 0), height = 3.5, color = "red") +
+        xlim(.18, .34) +
+        labs(title = 'The posterior beta distribution for Derek Jeter',
+             subtitle = '3465 H / 11195 AB, with the 95% credible interval')
+```
+
+
+```{r 'add-credible-intervals'}
+yankee_1998_career <- yankee_1998_career %>%
+    mutate(low  = qbeta(.025, alpha1, beta1),
+           high = qbeta(.975, alpha1, beta1))
+```
+
+```{r 'credible-interval-table', echo = FALSE}
+yankee_1998_career %>%
+    dplyr::select(-playerID, -alpha1, -beta1, -eb_estimate) %>%
+    knitr::kable()
+```
+
+```{r 'credible-interval-for-the-rest-of-the-players'}
+yankee_1998_career %>%
+    mutate(name = reorder(name, eb_estimate)) %>%
+    ggplot(aes(eb_estimate, name)) +
+        geom_point() +
+        geom_errorbarh(aes(xmin = low, xmax = high)) +
+        geom_vline(xintercept = alpha0 / (alpha0 + beta0), color = "red", lty = 2) +
+        xlab("Estimated batting average (w/ 95% interval)") +
+        ylab("Player")
+```
+
+#### 4.4 Credible intervals (CrI) and confidence intervals (CoI)
+
+  + There is a philosophical and a practical difference between the above two:
+      * Philosophical: The frequentist method (CoI) assumes that the parameter that we are estimating is an exact number and that the CoI will include that number X% of the times. The Bayesian method assumes that the parameter is picked from a distribution and the CrI describes this distribution.
+      * Practical: While the frequentist method doesn't use the information of other observations, the Bayesian method does so by calculating the priors.
+  + Frequentist and Bayesian intervals and estimates are becoming identical once we have many enough observations (see below)
+
+```{r 'credible-interval-vs-confidence-interval-plot', echo = FALSE}
+career_eb <- career_eb %>%
+    mutate(low = qbeta(.025, alpha1, beta1),
+           high = qbeta(.975, alpha1, beta1))
+
+set.seed(2015)
+
+some <- career_eb %>%
+    sample_n(20) %>%
+    mutate(name = paste0(name, " (", H, "/", AB, ")"))
+
+frequentist <- some %>%
+    group_by(playerID, name, AB) %>%
+    do(broom::tidy(binom.test(.$H, .$AB))) %>%
+    ungroup() %>%
+    dplyr::select(playerID, name, estimate, low = conf.low, high = conf.high) %>%
+    mutate(method = "Confidence")
+
+bayesian <- some %>%
+      dplyr::select(playerID, name, AB, estimate = eb_estimate,
+                    low = low, high = high) %>%
+      mutate(method = "Credible")
+
+combined <- bind_rows(frequentist, bayesian)
+
+combined %>%
+    mutate(name = reorder(name, -AB, na.rm = TRUE)) %>%
+    ggplot(aes(estimate, name, color = method, group = method)) +
+        geom_point() +
+        geom_errorbarh(aes(xmin = low, xmax = high)) +
+        geom_vline(xintercept = alpha0 / (alpha0 + beta0), color = "red", lty = 2) +
+        xlab("Estimated batting average") +
+        ylab("Player") +
+    labs(color = "")
+```
+

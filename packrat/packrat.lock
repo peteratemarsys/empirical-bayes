@@ -65,6 +65,12 @@ Source: CRAN
 Version: 1.0-6
 Hash: 67d0775189fd0041d95abca618c5c07e
 
+Package: broom
+Source: CRAN
+Version: 0.4.5
+Hash: 514abdac5bd99ae5a232784431e1c0f2
+Requires: dplyr, plyr, psych, reshape2, stringr, tidyr
+
 Package: caTools
 Source: CRAN
 Version: 1.17.1
@@ -179,6 +185,11 @@ Source: CRAN
 Version: 0.5
 Hash: 463550cf44fb6f0a2359368f42eebe62
 
+Package: mnormt
+Source: CRAN
+Version: 1.5-5
+Hash: d0d5efbb1fb26d2dc5f9394c223084b5
+
 Package: munsell
 Source: CRAN
 Version: 0.4.3
@@ -211,6 +222,12 @@ Source: CRAN
 Version: 1.8.4
 Hash: 39dd3286b865c7b725d74c9a4c1b7931
 Requires: Rcpp
+
+Package: psych
+Source: CRAN
+Version: 1.8.4
+Hash: eb0040e47d327c4416ea68c9cb01316f
+Requires: mnormt
 
 Package: purrr
 Source: CRAN
