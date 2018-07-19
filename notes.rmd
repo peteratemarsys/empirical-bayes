@@ -152,9 +152,9 @@ career %>%
         geom_histogram(bins = 50)
 ```
 
-    + Now we would need to fit the follwing model to find the $\alpha_0$ and $\beta_0$ *hyper-parameters*:
+  + Now we would need to fit the follwing model to find the $\alpha_0$ and $\beta_0$ *hyper-parameters*:
 
-    \[ X \sim Beta(\alpha_0, \beta_0) \]
+  \[ X \sim Beta(\alpha_0, \beta_0) \]
 
 ```{r 'maximum-likelihood'}
 career_filtered <- career %>%
@@ -220,19 +220,19 @@ ggplot(career_eb, aes(average, eb_estimate, color = AB)) +
 
   + The horizontal dashed lines shows $\frac{\alpha_0}{\alpha_0 + \beta_0}$. That would be our Bayesian estimate if someone would have $AB = H = 0$. The red diagonal line shows $x = y$. Points near that line are the brightest, because the more evidence we have, the less we distort (update) the average with the priors.
 
-  > This process is often called **shrinkage**: the process of moving all our estimates towards the averge. Or in other words: *Extraordinary outliers require extraordinary evidence.*
+  > This process is often called **shrinkage**: the process of moving all our estimates towards the average. Or in other words: *Extraordinary outliers require extraordinary evidence.*
 
 ## 4. Credible Intervals
 
   > Empirical Bayes gives us a reliable estimate but sometimes we want to know more than just our "best guess", and instead wish to know how much uncertainty is present in our point estimate
 
-  + The problem with binomial proportion confidence interval is that is desn't use prior knowledge. As a result for betters with short history it would give a huge confidence range
+  + The problem with binomial proportion confidence interval is that is doesn't use prior knowledge. As a result for betters with short history it would give a huge confidence range
 
 #### 4.1 Setup [intentionally left out]
 
 #### 4.2 Posterior distribution
 
-  + Apart from calculating point estimates from priors and evidence from players we can also calculate an updated personal Beta distribution for each player. What we are looking for is $\alpha_1 = \alpha_0 + H$ and $\beta_1 = \beta0 + AB - H$
+  + Apart from calculating point estimates from priors and evidence from players we can also calculate an updated personal Beta distribution for each player. What we are looking for is $\alpha_1 = \alpha_0 + H$ and $\beta_1 = \beta_0 + AB - H$
 
 ```{r 'posterior-distributions'}
 career_eb <- career_eb %>%
@@ -351,4 +351,8 @@ combined %>%
         ylab("Player") +
     labs(color = "")
 ```
+
+# II Hypothesis testing
+
+## 5. Hypothesis testing and FDR
 
