@@ -3,8 +3,8 @@ title: 'Notes from *Introduction to Empirical Bayes*'
 author: 'Peter Lukacs'
 output:
     html_document:
-        fig_width: 7
-        fig_height: 5
+        fig_width: 9
+        fig_height: 6
         fig_align: center
 ---
 
@@ -12,6 +12,9 @@ output:
 source('global.R')
 
 theme_set(theme_light())
+theme_update(axis.title = element_text(size = 14),
+             axis.text = element_text(size = 14),
+             title = element_text(size = 16))
 ```
 
 # I Empirical Bayes
