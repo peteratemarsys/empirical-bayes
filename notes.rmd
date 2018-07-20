@@ -209,7 +209,7 @@ career_eb %>% top_n(5, eb_estimate)
 career_eb %>% top_n(-5, eb_estimate)
 ```
 
-    + See below how empirical Bayes changed our estimate of batting averages:
+  + See below how empirical Bayes changed our estimate of batting averages:
 
 ```{r 'empirical-vs-bayesian-batting-averages', echo = FALSE}
 ggplot(career_eb, aes(average, eb_estimate, color = AB)) +
@@ -359,3 +359,58 @@ combined %>%
 
 ## 5. Hypothesis testing and FDR
 
+#### 5.1 Setup [intentionally left out]
+
+#### 5.2 Posterior Error Probabilities (PEP)
+
+  + Imagine a situation where we'd like to make a Hall of Fame for players whose "true probability" of hitting is above 0.3.
+  + Take e.g. Hank Aaron: his batting average is 0.3050 and his shrunken posterior estimate is 0.3037. We can thus suspect that his true probability of hitting is higher than 0.3 but we are not certain. We can take a look at his posterior beta distribution
+
+```{r 'hank-aaron-PEP-plot', echo = FALSE, warning = FALSE}
+aaron <- yankee_beta %>%
+    filter(name == "Hank Aaron")
+
+aaron %>%
+    ggplot(aes(x, density)) +
+        geom_line() +
+        geom_ribbon(aes(ymin = 0, ymax = density), data = setDT(aaron)[x <= .300],
+                    alpha = .25, fill = "red") +
+        geom_vline(xintercept = .300, color = "red", lty = 2) +
+        xlim(.28, .32) +
+        labs(title = 'The posterior beta distribution for Derek Jeter',
+             subtitle = 'PEP highlighted with red - for considering inclusion into the Hall of Fame (BA > 0.3)',
+             x = 'Betting average',
+             y = 'density')
+```
+
+  + See, that there is a non-zero probability that his true probability is less than 0.3 (shaded). We can calculate the size of this area with the cumulative distribution function (CDF). In R: `pbeta`
+  + This probability is called the **Posterior Error Probability**
+
+```{r 'hank-aaron-PEP-probability'}
+    hanka_hyper_params <- career_eb  %>%
+        filter(name == 'Hank Aaron') %>%
+        .[, c('alpha1', 'beta1')]
+
+    pbeta(.3, hanka_hyper_params[['alpha1']], hanka_hyper_params[['beta1']]) %>% scales::percent()
+```
+
+  + We can also calculate the PEP for each player and see its distribution below
+
+```{r 'all-players-PEP-probability'}
+    career_eb <- career_eb  %>%
+        mutate(PEP = pbeta(0.3, alpha1, beta1))
+
+    ggplot(career_eb, aes(PEP)) + geom_histogram(bins = 50)
+```
+
+  + See that most players clearly don't belong to the Hall of Fame, a few do without any doubt and then there are some inbetween.
+
+  + PEP is of course closely related to the Bayesian "shrunken" posterior BA estimate. Players with higher estimate are more likely to belong to the Hall. Also, see that players with less evidence have a higher chance of getting into the Hall than those with more evidence but same BA. This is because we are yet uncertain about their "true" BA due to their low number of at-bats (evidence). See below the relationship:
+
+```{r 'PEP-vs-bayesian-posterior-batting-average', echo = FALSE}
+ggplot(career_eb, aes(eb_estimate, PEP, color = AB)) +
+    geom_point() +
+    geom_vline(xintercept = .3, color = 'red', lty = 2) +
+    scale_colour_gradient(trans = 'log', breaks = 10 ^ (1:5)) +
+    xlab('Bayesian "shrunken" posterior BA estimate')
+```
