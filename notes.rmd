@@ -245,8 +245,8 @@ career_eb <- career_eb %>%
 
 ```{r 'posterior-distributions-plot', echo = FALSE}
 
-yankee_1998 <- c("brosisc01", "jeterde01", "knoblch01", "martiti02",
-                 "posadjo01", "strawda01", "willibe02")
+yankee_1998 <- c('brosisc01', 'jeterde01', 'knoblch01', 'martiti02',
+                 'posadjo01', 'strawda01', 'willibe02', 'aaronha01')
 
 yankee_1998_career <- career_eb %>%
     filter(playerID %in% yankee_1998)
