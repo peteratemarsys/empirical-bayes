@@ -419,7 +419,7 @@ ggplot(career_eb, aes(eb_estimate, PEP, color = AB)) +
 
   + We need to find a threshold for inclusion. This is arbitrary. One common solution in statistics is: "let's try to include as many players as possible, while ensuring that no more than 5% of the Hall of Fames was mistakenly included." Or in other words: "If you are in the Hall of Fames, the probability you belong there is at least 95%".
 
-  + We calculate the 5% FDR by ordering the players by PEP (lowest to highest) and start adding up (cummulatively) their PEP. If we select the top 100 players we could see e.g. that their PEP adds up to 5.9, meaning that 5.9% of the players are estimated to be included by mistake, which is close to a 6% FDR. With a bit lower threshold we are able to find the 5% FDR.
+  + We calculate the 5% FDR by ordering the players by PEP (lowest to highest) and start adding up (cumulatively) their PEP. If we select the top 100 players we could see e.g. that their PEP adds up to 5.9, meaning that 5.9% of the players are estimated to be included by mistake, which is close to a 6% FDR. With a bit lower threshold we are able to find the 5% FDR.
 
 ```{r 'FDR-for-100-players'}
 top_players <- career_eb %>%
@@ -431,11 +431,11 @@ scales::percent(
 )
 ```
 
-  + Note, that simply calculating the cummulative mean achieves the same results
+  + Note, that simply calculating the cumulative mean achieves the same results
 
 #### 5.4 Q-values
 
-  + We can start adding each player one by one and calculate the FDR at each new inclusion. This way we can calculate the cummulative mean PEP at each threshold, aka. the **q-value**.
+  + We can start adding each player one by one and calculate the FDR at each new inclusion. This way we can calculate the cumulative mean PEP at each threshold, aka. the **q-value**.
 
 ```{r 'cummean-PEP-at-each-threshold'}
 career_eb <- career_eb %>%
