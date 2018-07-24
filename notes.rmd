@@ -414,3 +414,53 @@ ggplot(career_eb, aes(eb_estimate, PEP, color = AB)) +
     scale_colour_gradient(trans = 'log', breaks = 10 ^ (1:5)) +
     xlab('Bayesian "shrunken" posterior BA estimate')
 ```
+
+#### 5.3 False Discovery Rate (FDR)
+
+  + We need to find a threshold for inclusion. This is arbitrary. One common solution in statistics is: "let's try to include as many players as possible, while ensuring that no more than 5% of the Hall of Fames was mistakenly included." Or in other words: "If you are in the Hall of Fames, the probability you belong there is at least 95%".
+
+  + We calculate the 5% FDR by ordering the players by PEP (lowest to highest) and start adding up (cummulatively) their PEP. If we select the top 100 players we could see e.g. that their PEP adds up to 5.9, meaning that 5.9% of the players are estimated to be included by mistake, which is close to a 6% FDR. With a bit lower threshold we are able to find the 5% FDR.
+
+```{r 'FDR-for-100-players'}
+top_players <- career_eb %>%
+    arrange(PEP) %>%
+    head(100)
+
+scales::percent(
+    sum(top_players$PEP) / nrow(top_players)
+)
+```
+
+  + Note, that simply calculating the cummulative mean achieves the same results
+
+#### 5.4 Q-values
+
+  + We can start adding each player one by one and calculate the FDR at each new inclusion. This way we can calculate the cummulative mean PEP at each threshold, aka. the **q-value**.
+
+```{r 'cummean-PEP-at-each-threshold'}
+career_eb <- career_eb %>%
+    arrange(PEP) %>%
+    mutate(qvalue = cummean(PEP))
+
+hall_of_fame <- career_eb %>%
+    filter(qvalue < .05)
+
+nrow(hall_of_fame)
+```
+
+```{r 'q-value-plot', echo = FALSE}
+career_eb %>%
+    filter(qvalue < .3) %>%
+    ggplot(aes(qvalue, rank(PEP))) +
+        geom_line() +
+        geom_vline(xintercept = 0.05, color = "red", lty = 2) +
+        scale_x_continuous(breaks = seq(0, 1, 0.05), labels = scales::percent_format()) +
+        ggrepel::geom_label_repel(data = data.table(label = nrow(hall_of_fame), x = 0.05, y = nrow(hall_of_fame)), mapping = aes(x, y, label = label), nudge_y = 10, nudge_x = -0.01) +
+        xlab("q-value threshold") +
+        ylab("Number of players included at this threshold") +
+        labs(title = 'Number of players included in the Hall of Fame at each FDR',
+             subtitle = '5% FDR shown with the red line')
+```
+
+
+
