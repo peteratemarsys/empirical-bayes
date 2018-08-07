@@ -38,7 +38,7 @@ ggplot(beta_distro_dt, aes(x, beta_density_value, color = Parameters)) +
 
     \[Batting\ Average = \frac{H}{AB}\]
 
-  + If a player starts out with a single or a strike out we wont't predict that his BA will be 1 or 0. This is because we've seen in the history that players tend to have a BA between .270 and .300, thus we have *prior expectations*.
+  + If a player starts out with a single or a strike out we won't predict that his BA will be 1 or 0. This is because we've seen in the history that players tend to have a BA between .270 and .300, thus we have *prior expectations*.
 
     > The number of hits a player gets out of his at-bats is an example of a **binomial distribution**, which models a count of successes out of a total. Since it's a binomial, the best way to represent the prior expectations is with the beta distribution.
 
@@ -111,7 +111,7 @@ simulations %>%
 
 ## 3 Empirical Bayes estimation
 
-  + This method will fit a beta distribution on all observations which is then used to omprove each individually. This way we won't need to have prior expectations
+  + This method will fit a beta distribution on all observations which is then used to improve each individually. This way we won't need to have prior expectations
 
 #### 3.1 Setup: the Lahman baseball dataset
 
@@ -145,7 +145,7 @@ career %>% top_n(-5, average)
 
 #### 3.2 Step 1: Estimate a prior from all the data
 
-  + It's sometimes not appropriate to use the data we analyze to calculate the priors but with the amount of data we have currenltly it's fine, since the estimate won't depend much on any individual.
+  + It's sometimes not appropriate to use the data we analyze to calculate the priors but with the amount of data we have currently it's fine, since the estimate won't depend much on any individual.
   + The below histogram shows that a beta distribution is a pretty appropriate choice for our data
 
 ```{r 'histogram-of-BAs', echo=FALSE, warning=FALSE}
@@ -155,7 +155,7 @@ career %>%
         geom_histogram(bins = 50)
 ```
 
-  + Now we would need to fit the follwing model to find the $\alpha_0$ and $\beta_0$ *hyper-parameters*:
+  + Now we would need to fit the following model to find the $\alpha_0$ and $\beta_0$ *hyper-parameters*:
 
   \[ X \sim Beta(\alpha_0, \beta_0) \]
 
@@ -324,7 +324,7 @@ career_eb <- career_eb %>%
     mutate(low = qbeta(.025, alpha1, beta1),
            high = qbeta(.975, alpha1, beta1))
 
-set.seed(2015)
+set.seed(2018)
 
 some <- career_eb %>%
     sample_n(20) %>%
