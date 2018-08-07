@@ -403,7 +403,7 @@ aaron %>%
     ggplot(career_eb, aes(PEP)) + geom_histogram(bins = 50)
 ```
 
-  + See that most players clearly don't belong to the Hall of Fame, a few do without any doubt and then there are some inbetween.
+  + See that most players clearly don't belong to the Hall of Fame, a few do without any doubt and then there are some in between.
 
   + PEP is of course closely related to the Bayesian "shrunken" posterior BA estimate. Players with higher estimate are more likely to belong to the Hall. Also, see that players with less evidence have a higher chance of getting into the Hall than those with more evidence but same BA. This is because we are yet uncertain about their "true" BA due to their low number of at-bats (evidence). See below the relationship:
 
@@ -462,5 +462,46 @@ career_eb %>%
              subtitle = '5% FDR shown with the red line')
 ```
 
+## 6. Bayesian A/B testing
 
+#### 6.1 Setup [intentionally left out]
 
+#### 6.2 Comparing posterior distributions
+
+  + How to tell if Mike Piazza is better than Hank Aaron? His career batting average is slightly better but how confident are we that this isn't just chance?
+
+```{r 'aaron-and-piazza', echo = FALSE, warning = FALSE}
+aaron <- career_eb %>% filter(name == "Hank Aaron")
+piazza <- career_eb %>% filter(name == "Mike Piazza")
+two_players <- bind_rows(aaron, piazza)
+
+two_players_beta <- two_players %>%
+    crossing(x = seq(.18, .33, .0002)) %>%
+    ungroup() %>%
+    mutate(density = dbeta(x, alpha1, beta1))
+
+ggplot(two_players_beta, aes(x, density, color = name)) +
+    geom_line() +
+    xlim(c(0.28, NA)) +
+    labs(color = "", x = 'Bayesian BA')
+```
+
+  + There are 4 ways that can quantify which player is better. I'll only include the first one in this note:
+    + Simulation: No math involved (+)
+    + Integration: Difficult when there are more than two dimensions (-)
+    + Closed-form solution: Can be hard and not always a solution (-); Exact (+)
+    + Closed-form approximation: Fast (+); Beta can only be approximated with the Normal curve when hyper-parameters are high (-)
+
+##### 6.2.1 Simulation of posterior draws
+
+  + Use each player's $\alpha_1$ and $\beta_1$ parameters, draw a million items from each distribution and compare the results
+
+```{r 'A/B simulation'}
+    piazza_simulation <- rbeta(1e6, piazza$alpha1, piazza$beta1)
+    aaron_simulation <- rbeta(1e6, aaron$alpha1, aaron$beta1)
+
+    sim <- mean(piazza_simulation > aaron_simulation)
+    sim %>% scales::percent()
+```
+
+  + This tells us that we are 59.4% certain that Piazza is better than Aaron. This answer is usually good enough depending on need for precision and computational efficiency.
