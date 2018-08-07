@@ -1,6 +1,6 @@
 ---
-title: 'Notes from *Introduction to Empirical Bayes*'
-author: 'Peter Lukacs'
+title: 'Notes from *Introduction to Empirical Bayes* by David Robinson'
+author: 'Péter A. Lukács'
 output:
     html_document:
         fig_width: 9
