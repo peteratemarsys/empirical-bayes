@@ -510,6 +510,7 @@ ggplot(two_players_beta, aes(x, density, color = name)) +
 
 ## 7 Beta binomial regression
 
-  + **problem**: so far we dismissed the intuition that a player with higher AB gets played more because he is better.
-  + This could be incorporated into the priors so that now every player would have a personal prior
-  +
+  + **problem**: so far we dismissed the intuition that a player with higher AB probably gets played more because he is good
+  + This could be incorporated into the priors so that now every player would have a personal prior: we can fit a linear model on the data where the BA is linearly dependent on the ABs.
+  + In this model the variance of the prior Beta distribution is not effected
+  + In **R** the `gamlss` library can be used to fit a Beta binomial regression
